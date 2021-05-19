@@ -1,3 +1,5 @@
+from django.apps import apps
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils import timezone
@@ -13,7 +15,7 @@ class MyUserManager(UserManager):
         if not username:
             raise ValueError('The given username must be set')
         if not email:
-            raise ValueError('The given username must be set')
+            raise ValueError('The given email must be set')
 
         email = self.normalize_email(email)
         # Lookup the real model class from the global app registry so this
