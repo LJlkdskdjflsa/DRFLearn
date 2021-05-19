@@ -7,4 +7,4 @@ class TrackingModel(models.Model):
     class Meta:
         abstract = True
         #set the model be abstract
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
