@@ -6,6 +6,11 @@ from django.utils import timezone
 from helpers.models import TrackingModel
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+from datetime import datetime, timedelta
+
+import jwt
+
 
 class MyUserManager(UserManager):
     def _create_user(self, username, email, password, **extra_fields):
@@ -64,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingModel):
             'unique': _("A user with that username already exists."),
         },
     )
-    email = models.EmailField(_('email address'), blank=False,unique=True)
+    email = models.EmailField(_('email address'), blank=False, unique=True)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -89,13 +94,18 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingModel):
     )
 
     objects = MyUserManager()
-    #soft delete
+    # soft delete
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    #token don't save in db
+    # token don't save in db
     @property
     def token(self):
-        return ''
+        token = jwt.encode(
+            {'username': self.username, 'email': self.email, 'exp': datetime.utcnow() + timedelta(hours=48)},
+            settings.SECRET_KEY,
+            algorithm='HS256')
+        # exp:expity time (how long the token can exist)
+        return token
